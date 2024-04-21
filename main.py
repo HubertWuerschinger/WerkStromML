@@ -9,7 +9,7 @@ loaded_model = joblib.load(model_file_path)
 
 # Funktion zur Durchführung der Vorhersage
 def predict(df):
-    X = df[['Mean Amplitude', 'Standard Deviation (Amplitude)']]
+    X = df[['Area Under Curve', 'Standard Deviation (Frequency)']]
     y_pred = loaded_model.predict(X)
     return y_pred
 
