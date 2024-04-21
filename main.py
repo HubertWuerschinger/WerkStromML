@@ -77,7 +77,8 @@ def main():
         # Anzeige der Vorhersagen mit Farbskala und Balken
         st.subheader("Werkzeugverschleißmessung:")
         for pred in y_pred:
-            st.write(f"Modellprognose: {pred} µm", unsafe_allow_html=True, key=str(pred))
+            st.write(f"Modellprognose: {int(pred)} µm", unsafe_allow_html=True, key=str(int(pred)))
+
             st.write(
                 f"<div style='background-color: {color_scale(pred)}; padding: 8px; border-radius: 5px;'></div>",
                 unsafe_allow_html=True
