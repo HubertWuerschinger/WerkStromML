@@ -3,6 +3,7 @@ import pandas as pd
 import h5py
 import json
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 # Laden des gespeicherten Regressionsmodells
 model_file_path = "regression_model.h5"
@@ -74,38 +75,28 @@ def main():
 
         # Vorhersage durchführen
         y_pred = predict(df[['Area Under Curve', 'Standard Deviation (Frequency)']])
-        
-        # Anzeige der Vorhersagen mit Farbskala und Balken
-        st.subheader("Werkzeugverschleißmessung:")
-        for pred in y_pred:
-            st.write(f"Modellprognose: {int(pred)} µm", unsafe_allow_html=True, key=str(int(pred)))
 
-            st.write(
-                f"<div style='background-color: {color_scale(pred)}; padding: 8px; border-radius: 5px;'></div>",
-                unsafe_allow_html=True
-            )
-            
-            # Anzeige des Balkens mit variabler Länge basierend auf dem Verschleißgrad
-            #st.subheader("Werkzeugverschleiß:")
+        # Daten für das Diagramm sammeln
+        tool_capacity_list = []
+        for pred in y_pred:
             if pred <= 0:
                 tool_capacity = 100
             elif pred >= 300:
                 tool_capacity = 0
             else:
-                tool_capacity = 100 - int(100 * (pred / 300))  # Umgekehrter Verschleißgrad
-            #st.progress(tool_capacity)
+                tool_capacity = 100 - int(100 * (pred / 300))
+            tool_capacity_list.append(tool_capacity)
 
-            # Anzeige der Prognose in Prozent
-            #st.write(f"Werkzeugvebrauch: {tool_capacity}%")
+        # Diagramm erstellen
+        plt.figure(figsize=(10, 6))
+        plt.plot(tool_capacity_list, y_pred, marker='o', linestyle='-', color='b')
+        plt.title('Werkzeugverschleiß')
+        plt.xlabel('Werkzeugkapazität (%)')
+        plt.ylabel('Werkzeugverschleiß (µm)')
+        plt.grid(True)
 
-            st.subheader("Verschleißgrad:")
-            progress_bar_value = int(100 * (pred / 300))  # Umrechnung von µm in Prozent
-            st.progress(progress_bar_value)
-
-            # Anzeige der Prognose in Prozent
-            st.write(f"Werkzeugvebrauch: {progress_bar_value}%")
-
-
+        # Anzeige des Diagramms
+        st.pyplot(plt)
 
         # Aktuelles Datum und Uhrzeit
         now = datetime.now()
@@ -123,14 +114,12 @@ def main():
 
         df = pd.concat([df, new_data], ignore_index=True)
 
-
         # Speichern der Daten in einer JSON-Datei
         if st.sidebar.button("Daten speichern"):
             with open('Arbeitsdaten.JSON', 'a') as file:
                 df.to_json(file, orient='records', lines=True)
             file.close()
             st.sidebar.success("Daten erfolgreich gespeichert!")
-
 
 if __name__ == "__main__":
     main()
