@@ -128,6 +128,7 @@ def main():
         if st.sidebar.button("Daten speichern"):
             with open('./Arbeitsdaten.JSON', 'a') as file:
                 df.to_json(file, orient='records', lines=True)
+            file.close()
             st.sidebar.success("Daten erfolgreich gespeichert!")
 
 
