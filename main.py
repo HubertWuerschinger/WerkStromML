@@ -75,7 +75,7 @@ def main():
         y_pred = predict(df[['Area Under Curve', 'Standard Deviation (Frequency)']])
         
         # Anzeige der Vorhersagen mit Farbskala und Balken
-        st.subheader("Vorhersagen:")
+        st.subheader("Werkzeugverschleißmessung:")
         for pred in y_pred:
             st.write(f"Prognose: {pred} µm", unsafe_allow_html=True, key=str(pred))
             st.write(
@@ -89,7 +89,7 @@ def main():
             st.progress(progress_bar_value)
 
             # Anzeige der Prognose in Prozent
-            st.write(f"Prognose: {progress_bar_value}%")
+            st.write(f"Werkzeugkapazität: {progress_bar_value}%")
 
 
 
