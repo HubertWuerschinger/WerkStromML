@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import h5py
+import json
 from datetime import datetime
 
 # Laden des gespeicherten Regressionsmodells
@@ -55,7 +56,7 @@ def slider_color_scale(value):
 
 # Streamlit-Anwendung
 def main():
-    st.title("WerkStromML - Verschleißmessung mittels Strömungsgeräuschen")
+    st.title("WerkStromML")
     st.sidebar.title("CSV hochladen und Arbeitsdaten eingeben")
 
     # CSV-Datei hochladen
@@ -112,15 +113,19 @@ def main():
         current_time = now.strftime("%H:%M:%S")
 
         # Arbeitsdaten hinzufügen
-        df['Aktuelles Datum'] = current_date
-        df['Uhrzeit'] = current_time
-        df['Werkzeugtyp'] = werkzeugtyp
-        df['Einsatzdauer'] = einsatzdauer_min
-        df['Bearbeitetes Material'] = material
+        new_data = pd.DataFrame({
+            'Aktuelles Datum': [current_date],
+            'Uhrzeit': [current_time],
+            'Werkzeugtyp': [werkzeugtyp],
+            'Einsatzdauer': [einsatzdauer_min],
+            'Bearbeitetes Material': [material]
+        })
 
-        # Speichern der Daten in einer CSV-Datei
+        df = df.append(new_data, ignore_index=True)
+
+        # Speichern der Daten in einer JSON-Datei
         if st.sidebar.button("Daten speichern"):
-            df.to_csv('Arbeitsdaten.csv', index=False)
+            df.to_json('Arbeitsdaten.txt', orient='records', mode='a')
             st.sidebar.success("Daten erfolgreich gespeichert!")
 
 if __name__ == "__main__":
