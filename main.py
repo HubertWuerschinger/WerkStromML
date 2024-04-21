@@ -34,7 +34,7 @@ def main():
         load_model()
 
         # Vorhersage durchführen
-        y_pred = predict(df)
+        y_pred = predict(df[['Area Under Curve', 'Standard Deviation (Frequency)']])
         
         # Anzeige der Vorhersagen
         st.subheader("Predictions:")
