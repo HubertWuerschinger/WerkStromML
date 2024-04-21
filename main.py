@@ -121,7 +121,8 @@ def main():
             'Bearbeitetes Material': [material]
         })
 
-        df = df.concat(new_data, ignore_index=True)
+        df = pd.concat([df, new_data], ignore_index=True)
+
 
         # Speichern der Daten in einer JSON-Datei
         if st.sidebar.button("Daten speichern"):
