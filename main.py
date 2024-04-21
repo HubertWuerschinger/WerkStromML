@@ -38,6 +38,21 @@ def color_scale(value):
     else:
         return 'darkred'
 
+# Farbskala für den Slider basierend auf dem Prognosewert
+def slider_color_scale(value):
+    if value <= 50:
+        return '#00FF00'  # Grün
+    elif value <= 100:
+        return '#7FFF00'  # Grasgrün
+    elif value <= 150:
+        return '#FFFF00'  # Gelb
+    elif value <= 200:
+        return '#FFA500'  # Orange
+    elif value <= 250:
+        return '#FF0000'  # Rot
+    else:
+        return '#8B0000'  # Dunkelrot
+
 # Streamlit-Anwendung
 def main():
     st.title("Regression Prediction App")
@@ -67,7 +82,8 @@ def main():
                 f"<div style='background-color: {color_scale(pred)}; padding: 8px; border-radius: 5px;'></div>",
                 unsafe_allow_html=True
             )
-            st.slider("Prognosewert", min_value=0, max_value=300, value=int(pred), step=1, key=str(pred))
+            st.slider("Prognosewert", min_value=0, max_value=300, value=int(pred), step=1, key=str(pred),
+                      key=str(pred), color=slider_color_scale(pred))
 
         # Aktuelles Datum und Uhrzeit
         now = datetime.now()
