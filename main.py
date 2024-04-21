@@ -93,8 +93,8 @@ def main():
                 tool_capacity = 100 - int(100 * (pred / 300))  # Umgekehrter Verschleißgrad
             st.progress(tool_capacity)
 
-# Anzeige der Prognose in Prozent
-st.write(f"Werkzeugvebrauch: {tool_capacity}%")
+            # Anzeige der Prognose in Prozent
+            st.write(f"Werkzeugvebrauch: {tool_capacity}%")
 
             st.subheader("Verschleißgrad:")
             progress_bar_value = int(100 * (pred / 300))  # Umrechnung von µm in Prozent
