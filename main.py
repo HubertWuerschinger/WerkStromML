@@ -38,7 +38,7 @@ def color_scale(value):
     else:
         return 'darkred'
 
-# Farbskala für den Slider basierend auf dem Prognosewert
+# Farbskala für den Balken basierend auf dem Prognosewert
 def slider_color_scale(value):
     if value <= 50:
         return '#00FF00'  # Grün
@@ -74,7 +74,7 @@ def main():
         # Vorhersage durchführen
         y_pred = predict(df[['Area Under Curve', 'Standard Deviation (Frequency)']])
         
-        # Anzeige der Vorhersagen mit Farbskala und Slider
+        # Anzeige der Vorhersagen mit Farbskala und Balken
         st.subheader("Vorhersagen:")
         for pred in y_pred:
             st.write(f"Prognose: {pred} µm", unsafe_allow_html=True, key=str(pred))
@@ -82,8 +82,9 @@ def main():
                 f"<div style='background-color: {color_scale(pred)}; padding: 8px; border-radius: 5px;'></div>",
                 unsafe_allow_html=True
             )
-            st.slider("Prognosewert", min_value=0, max_value=300, value=int(pred), step=1,
-                      color=slider_color_scale(pred))
+            st.write('Neuwertig', 'Defekt', key=str(pred))
+            slider_val = st.slider("Prognosewert", min_value=0, max_value=300, value=int(pred), step=1,
+                                   color=slider_color_scale(pred))
 
         # Aktuelles Datum und Uhrzeit
         now = datetime.now()
