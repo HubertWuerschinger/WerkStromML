@@ -1,17 +1,24 @@
 import streamlit as st
 import pandas as pd
-from sklearn.linear_model import LinearRegression
-import joblib
+import h5py
 
 # Laden des gespeicherten Regressionsmodells
 model_file_path = "regression_model.h5"
-loaded_model = joblib.load(model_file_path)
+loaded_model = None
+
+def load_model():
+    global loaded_model
+    with h5py.File(model_file_path, 'r') as file:
+        loaded_model = file['model'][:]
 
 # Funktion zur Durchführung der Vorhersage
 def predict(df):
-    X = df[['Area Under Curve', 'Standard Deviation (Frequency)']]
-    y_pred = loaded_model.predict(X)
-    return y_pred
+    if loaded_model is not None:
+        X = df[['Area Under Curve', 'Standard Deviation (Frequency)']]
+        y_pred = loaded_model.predict(X)
+        return y_pred
+    else:
+        st.error("Error: Model not loaded")
 
 # Streamlit-Anwendung
 def main():
@@ -22,6 +29,9 @@ def main():
     uploaded_file = st.sidebar.file_uploader("Upload CSV", type=["csv"])
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
+
+        # Laden des Modells
+        load_model()
 
         # Vorhersage durchführen
         y_pred = predict(df)
