@@ -77,19 +77,31 @@ def main():
         # Anzeige der Vorhersagen mit Farbskala und Balken
         st.subheader("Werkzeugverschleißmessung:")
         for pred in y_pred:
-            st.write(f"Prognose: {pred} µm", unsafe_allow_html=True, key=str(pred))
+            st.write(f"Modellprognose: {pred} µm", unsafe_allow_html=True, key=str(pred))
             st.write(
                 f"<div style='background-color: {color_scale(pred)}; padding: 8px; border-radius: 5px;'></div>",
                 unsafe_allow_html=True
             )
             
             # Anzeige des Balkens mit variabler Länge basierend auf dem Verschleißgrad
+            st.subheader("Werkzeugverschleiß:")
+            if pred <= 0:
+                tool_capacity = 100
+            elif pred >= 300:
+                tool_capacity = 0
+            else:
+                tool_capacity = 100 - int(100 * (pred / 300))  # Umgekehrter Verschleißgrad
+            st.progress(tool_capacity)
+
+# Anzeige der Prognose in Prozent
+st.write(f"Werkzeugvebrauch: {tool_capacity}%")
+
             st.subheader("Verschleißgrad:")
             progress_bar_value = int(100 * (pred / 300))  # Umrechnung von µm in Prozent
             st.progress(progress_bar_value)
 
             # Anzeige der Prognose in Prozent
-            st.write(f"Werkzeugkapazität: {progress_bar_value}%")
+            st.write(f"Werkzeugvebrauch: {progress_bar_value}%")
 
 
 
