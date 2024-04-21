@@ -91,7 +91,7 @@ def main():
                 tool_capacity = 0
             else:
                 tool_capacity = 100 - int(100 * (pred / 300))  # Umgekehrter Verschleißgrad
-            st.progress(tool_capacity)
+            #st.progress(tool_capacity)
 
             # Anzeige der Prognose in Prozent
             st.write(f"Werkzeugvebrauch: {tool_capacity}%")
