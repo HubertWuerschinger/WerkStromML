@@ -67,7 +67,7 @@ def main():
                 f"<div style='background-color: {color_scale(pred)}; padding: 8px; border-radius: 5px;'></div>",
                 unsafe_allow_html=True
             )
-            st.slider("Prognosewert", min_value=0, max_value=300, value=pred, key=str(pred))
+            st.slider("Prognosewert", min_value=0, max_value=300, value=int(pred), step=1, key=str(pred))
 
         # Aktuelles Datum und Uhrzeit
         now = datetime.now()
