@@ -83,7 +83,14 @@ def main():
                 unsafe_allow_html=True
             )
             
-            slider_val = st.slider("Prognosewert", min_value=0, max_value=300, value=pred[0] statt int(round(sum(y_pred) / len(y_pred))), step=1)
+            # Anzeige des Balkens mit variabler Länge basierend auf dem Verschleißgrad
+            st.subheader("Verschleißgrad:")
+            progress_bar_value = int(100 * (pred / 300))  # Umrechnung von µm in Prozent
+            st.progress(progress_bar_value)
+
+            # Anzeige der Prognose in Prozent
+            st.write(f"Prognose: {progress_bar_value}%")
+
 
 
         # Aktuelles Datum und Uhrzeit
