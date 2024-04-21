@@ -60,6 +60,17 @@ def slider_color_scale(value):
     else:
         return '#8B0000'  # Dunkelrot
 
+# Funktion zum Erstellen des Diagramms
+def create_chart():
+    plt.figure(figsize=(10, 6))
+    plt.plot(time_list, y_pred_list, marker='o', linestyle='-', color='b')
+    plt.title('Werkzeugverschleiß')
+    plt.xlabel('Zeit')
+    plt.ylabel('Werkzeugverschleiß (µm)')
+    plt.grid(True)
+    plt.xticks(rotation=45)  # Rotation der X-Achsen-Beschriftungen
+    return plt
+
 # Streamlit-Anwendung
 def main():
     st.title("WerkStromML")
@@ -96,16 +107,8 @@ def main():
             y_pred_list.append(pred)
 
         # Diagramm erstellen
-        plt.figure(figsize=(10, 6))
-        plt.plot(time_list, y_pred_list, marker='o', linestyle='-', color='b')
-        plt.title('Werkzeugverschleiß')
-        plt.xlabel('Zeit')
-        plt.ylabel('Werkzeugverschleiß (µm)')
-        plt.grid(True)
-        plt.xticks(rotation=45)  # Rotation der X-Achsen-Beschriftungen
-
-        # Anzeige des Diagramms
-        st.pyplot(plt)
+        st.subheader("Werkzeugverschleiß-Diagramm")
+        st.pyplot(create_chart())
 
         # Anzeige der Vorhersagen mit Farbskala und Balken
         st.subheader("Werkzeugverschleißmessung:")
@@ -118,7 +121,6 @@ def main():
             )
             
             # Anzeige des Balkens mit variabler Länge basierend auf dem Verschleißgrad
-            #st.subheader("Werkzeugverschleiß:")
             if pred <= 0:
                 tool_capacity = 100
             elif pred >= 300:
@@ -127,10 +129,8 @@ def main():
                 tool_capacity = 100 - int(100 * (pred / 300))  # Umgekehrter Verschleißgrad
 
             st.subheader("Verschleißgrad:")
-            progress_bar_value = int(100 * (pred / 300))  # Umrechnung von µm in Prozent
+            progress_bar_value = int(100 * (pred / 300))
             st.progress(progress_bar_value)
-
-            # Anzeige der Prognose in Prozent
             st.write(f"Werkzeugvebrauch: {progress_bar_value}%")
 
         # Aktuelles Datum und Uhrzeit
