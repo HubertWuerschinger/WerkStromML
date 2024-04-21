@@ -83,8 +83,7 @@ def main():
                 unsafe_allow_html=True
             )
             st.write('Neuwertig', 'Defekt', key=str(pred))
-            slider_val = st.slider("Prognosewert", min_value=0, max_value=300, value=pred, step=1,
-                       color=slider_color_scale(pred))
+            slider_val = st.slider("Prognosewert", min_value=0, max_value=300, value=pred, step=1)
 
 
         # Aktuelles Datum und Uhrzeit
