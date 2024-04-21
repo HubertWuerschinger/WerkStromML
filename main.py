@@ -23,6 +23,21 @@ def predict(df):
     else:
         st.error("Fehler: Modell nicht geladen")
 
+# Farbskala für die Prognosewerte
+def color_scale(value):
+    if value <= 50:
+        return 'green'
+    elif value <= 100:
+        return 'lightgreen'
+    elif value <= 150:
+        return 'yellow'
+    elif value <= 200:
+        return 'orange'
+    elif value <= 250:
+        return 'red'
+    else:
+        return 'darkred'
+
 # Streamlit-Anwendung
 def main():
     st.title("Regression Prediction App")
@@ -44,9 +59,11 @@ def main():
         # Vorhersage durchführen
         y_pred = predict(df[['Area Under Curve', 'Standard Deviation (Frequency)']])
         
-        # Anzeige der Vorhersagen
+        # Anzeige der Vorhersagen mit Farbskala
         st.subheader("Vorhersagen:")
-        st.write(y_pred)
+        for pred in y_pred:
+            st.write(f"Prognose: {pred} µm", unsafe_allow_html=True, key=str(pred), 
+                     style={'color': color_scale(pred)})
 
         # Aktuelles Datum und Uhrzeit
         now = datetime.now()
@@ -61,7 +78,9 @@ def main():
         df['Bearbeitetes Material'] = material
 
         # Speichern der Daten in einer CSV-Datei
-        df.to_csv('Arbeitsdaten.csv', index=False)
+        if st.sidebar.button("Daten speichern"):
+            df.to_csv('Arbeitsdaten.csv', index=False)
+            st.sidebar.success("Daten erfolgreich gespeichert!")
 
 if __name__ == "__main__":
     main()
