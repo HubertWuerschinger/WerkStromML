@@ -98,6 +98,38 @@ def main():
         # Anzeige des Diagramms
         st.pyplot(plt)
 
+        # Anzeige der Vorhersagen mit Farbskala und Balken
+        st.subheader("Werkzeugverschleißmessung:")
+        for pred in y_pred:
+            st.write(f"Modellprognose: {int(pred)} µm", unsafe_allow_html=True, key=str(int(pred)))
+
+            st.write(
+                f"<div style='background-color: {color_scale(pred)}; padding: 8px; border-radius: 5px;'></div>",
+                unsafe_allow_html=True
+            )
+            
+            # Anzeige des Balkens mit variabler Länge basierend auf dem Verschleißgrad
+            #st.subheader("Werkzeugverschleiß:")
+            if pred <= 0:
+                tool_capacity = 100
+            elif pred >= 300:
+                tool_capacity = 0
+            else:
+                tool_capacity = 100 - int(100 * (pred / 300))  # Umgekehrter Verschleißgrad
+            #st.progress(tool_capacity)
+
+            # Anzeige der Prognose in Prozent
+            #st.write(f"Werkzeugvebrauch: {tool_capacity}%")
+
+            st.subheader("Verschleißgrad:")
+            progress_bar_value = int(100 * (pred / 300))  # Umrechnung von µm in Prozent
+            st.progress(progress_bar_value)
+
+            # Anzeige der Prognose in Prozent
+            st.write(f"Werkzeugvebrauch: {progress_bar_value}%")
+
+
+
         # Aktuelles Datum und Uhrzeit
         now = datetime.now()
         current_date = now.strftime("%Y-%m-%d")
@@ -114,12 +146,14 @@ def main():
 
         df = pd.concat([df, new_data], ignore_index=True)
 
+
         # Speichern der Daten in einer JSON-Datei
         if st.sidebar.button("Daten speichern"):
             with open('Arbeitsdaten.JSON', 'a') as file:
                 df.to_json(file, orient='records', lines=True)
             file.close()
             st.sidebar.success("Daten erfolgreich gespeichert!")
+
 
 if __name__ == "__main__":
     main()
