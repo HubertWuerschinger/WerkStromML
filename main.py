@@ -4,7 +4,7 @@ from sklearn.linear_model import LinearRegression
 import joblib
 
 # Laden des gespeicherten Regressionsmodells
-model_file_path = "regression_model.pkl"
+model_file_path = "regression_model.h5"
 loaded_model = joblib.load(model_file_path)
 
 # Funktion zur Durchführung der Vorhersage
