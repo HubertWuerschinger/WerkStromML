@@ -126,8 +126,10 @@ def main():
 
         # Speichern der Daten in einer JSON-Datei
         if st.sidebar.button("Daten speichern"):
-            df.to_json('Arbeitsdaten.txt', orient='records', mode='a')
+            with open('Arbeitsdaten.txt', 'a') as file:
+                df.to_json(file, orient='records', lines=True)
             st.sidebar.success("Daten erfolgreich gespeichert!")
+
 
 if __name__ == "__main__":
     main()
