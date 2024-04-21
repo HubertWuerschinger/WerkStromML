@@ -55,7 +55,7 @@ def slider_color_scale(value):
 
 # Streamlit-Anwendung
 def main():
-    st.title("Regression Prediction App")
+    st.title("WerkStromML - Verschleißmessung mittels Strömungsgeräuschen")
     st.sidebar.title("CSV hochladen und Arbeitsdaten eingeben")
 
     # CSV-Datei hochladen
