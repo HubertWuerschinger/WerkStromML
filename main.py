@@ -84,7 +84,7 @@ def main():
             )
             
             # Anzeige des Balkens mit variabler Länge basierend auf dem Verschleißgrad
-            st.subheader("Werkzeugverschleiß:")
+            #st.subheader("Werkzeugverschleiß:")
             if pred <= 0:
                 tool_capacity = 100
             elif pred >= 300:
@@ -94,7 +94,7 @@ def main():
             #st.progress(tool_capacity)
 
             # Anzeige der Prognose in Prozent
-            st.write(f"Werkzeugvebrauch: {tool_capacity}%")
+            #st.write(f"Werkzeugvebrauch: {tool_capacity}%")
 
             st.subheader("Verschleißgrad:")
             progress_bar_value = int(100 * (pred / 300))  # Umrechnung von µm in Prozent
