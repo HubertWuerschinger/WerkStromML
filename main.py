@@ -62,8 +62,11 @@ def main():
         # Anzeige der Vorhersagen mit Farbskala
         st.subheader("Vorhersagen:")
         for pred in y_pred:
-            st.write(f"Prognose: {pred} µm", unsafe_allow_html=True, key=str(pred), 
-                     style={'color': color_scale(pred)})
+            st.write(f"Prognose: {pred} µm", unsafe_allow_html=True, key=str(pred))
+            st.write(
+                f"<div style='background-color: {color_scale(pred)}; padding: 8px; border-radius: 5px;'></div>",
+                unsafe_allow_html=True
+            )
 
         # Aktuelles Datum und Uhrzeit
         now = datetime.now()
