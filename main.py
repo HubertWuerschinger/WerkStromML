@@ -82,9 +82,9 @@ def main():
     if 'data' not in st.session_state:
         st.session_state['data'] = pd.DataFrame()
 
-    werkzeugtyp = st.sidebar.text_input("Werkzeugtyp", "Typ XYZ")
+    werkzeugtyp = st.sidebar.text_input("Werkzeugtyp", "CNMG 120408-MM")
     einsatzdauer_min = st.sidebar.number_input("Einsatzdauer (Minuten)", value=60)
-    material = st.sidebar.text_input("Bearbeitetes Material", "Material ABC")
+    material = st.sidebar.text_input("Bearbeitetes Material", "Aluminium")
 
     uploaded_file = st.sidebar.file_uploader("CSV hochladen", type=["csv"])
     if uploaded_file:
