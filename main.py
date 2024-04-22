@@ -26,14 +26,16 @@ def predict(df):
         st.error("Fehler: Modell nicht geladen")
 
 def create_chart(df):
-    plt.figure(figsize=(10, 6))
-    plt.plot(pd.to_datetime(df['Uhrzeit']), df['Werkzeugverschleiß'], marker='o', linestyle='-', color='b')
-    plt.title('Werkzeugverschleiß')
-    plt.xlabel('Zeit')
-    plt.ylabel('Werkzeugverschleiß (µm)')
-    plt.grid(True)
-    plt.xticks(rotation=45)
-    plt.show()
+    if not df.empty:
+        plt.figure(figsize=(10, 6))
+        plt.plot(pd.to_datetime(df['Uhrzeit']), df['Werkzeugverschleiß'], marker='o', linestyle='-', color='b')
+        plt.title('Werkzeugverschleiß')
+        plt.xlabel('Zeit')
+        plt.ylabel('Werkzeugverschleiß (µm)')
+        plt.grid(True)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        st.pyplot(plt)
 
 def display_predictions(df):
     st.subheader("Werkzeugverschleißmessung:")
@@ -63,6 +65,9 @@ def main():
     st.title("WerkStromML")
     st.sidebar.title("CSV hochladen und Arbeitsdaten eingeben")
 
+    if 'data' not in st.session_state:
+        st.session_state['data'] = pd.DataFrame()
+
     werkzeugtyp = st.sidebar.text_input("Werkzeugtyp", "Typ XYZ")
     einsatzdauer_min = st.sidebar.number_input("Einsatzdauer (Minuten)", value=60)
     material = st.sidebar.text_input("Bearbeitetes Material", "Material ABC")
@@ -88,9 +93,13 @@ def main():
 
                 combined_data = pd.concat([existing_data, new_data], ignore_index=True)
                 combined_data.to_csv('Arbeitsdaten.csv', index=False)
+                st.session_state['data'] = combined_data
                 st.sidebar.success("Daten erfolgreich gespeichert!")
-                st.subheader("Werkzeugverschleiß-Diagramm")
-                create_chart(combined_data)
+
+    # Diagramm immer anzeigen, wenn Daten vorhanden sind
+    if not st.session_state['data'].empty:
+        st.subheader("Werkzeugverschleiß-Diagramm")
+        create_chart(st.session_state['data'])
 
 if __name__ == "__main__":
     main()
