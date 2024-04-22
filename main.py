@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import h5py
 from datetime import datetime
 import matplotlib.pyplot as plt
-import os
 
 # Laden des gespeicherten Regressionsmodells
 model_file_path = "regression_model.h5"
@@ -31,11 +31,15 @@ def create_chart(df):
         df['TimeDelta'] = (pd.to_datetime(df['Uhrzeit']) - pd.to_datetime(df['Uhrzeit']).iloc[0])
         df['Minutes'] = df['TimeDelta'].dt.total_seconds() / 60
         plt.figure(figsize=(10, 6))
-        plt.plot(df['Minutes'], df['Werkzeugverschleiß'], marker='o', linestyle='-', color='b')
-        plt.title('Werkzeugverschleiß')
+        plt.scatter(df['Minutes'], df['Werkzeugverschleiß'], marker='o', color='b', label='Datenpunkte')
+        z = np.polyfit(df['Minutes'], df['Werkzeugverschleiß'], 1)
+        p = np.poly1d(z)
+        plt.plot(df['Minutes'], p(df['Minutes']), "r--", label='Trendlinie')
+        plt.title(f'Werkzeugverschleiß - {df["Werkzeugtyp"].iloc[0]}, Material: {df["Bearbeitetes Material"].iloc[0]}')
         plt.xlabel('Zeit in Minuten seit Beginn')
         plt.ylabel('Werkzeugverschleiß (µm)')
         plt.grid(True)
+        plt.legend()
         plt.xticks(rotation=45)
         plt.tight_layout()
         st.pyplot(plt)
@@ -66,8 +70,8 @@ def color_scale(value):
         return 'darkred'
 
 def reset_data():
-    if os.path.exists('Arbeitsdaten.csv'):
-        os.remove('Arbeitsdaten.csv')
+    if 'Arbeitsdaten.csv' in st.session_state:
+        del st.session_state['Arbeitsdaten.csv']
     st.session_state['data'] = pd.DataFrame()
     st.success("Daten erfolgreich zurückgesetzt!")
 
