@@ -21,7 +21,7 @@ def predict(df):
     if loaded_model is not None:
         X = df[['Area Under Curve', 'Standard Deviation (Frequency)']]
         y_pred = X.dot(loaded_model['weights']) + loaded_model['intercept']
-        return y_pred
+        return y_pred.astype(int)  # Konvertieren zu ganzen Zahlen
     else:
         st.error("Fehler: Modell nicht geladen")
 
@@ -40,7 +40,8 @@ def create_chart(df):
 def display_predictions(df):
     st.subheader("Werkzeugverschleißmessung:")
     for _, row in df.iterrows():
-        pred = row['Werkzeugverschleiß']
+        pred = int(row['Werkzeugverschleiß'])  # Konvertieren zu ganzen Zahlen
+        st.write(f"Modellprognose: {pred} µm")
         color = color_scale(pred)
         st.markdown(f"<div style='background-color: {color}; padding: 8px; border-radius: 5px;'></div>", unsafe_allow_html=True)
         progress_bar_value = 100 - int(100 * (pred / 300))
