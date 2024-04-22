@@ -68,16 +68,10 @@ def main():
     st.title("WerkStromML")
     st.sidebar.title("CSV hochladen und Arbeitsdaten eingeben")
 
-    # Laden der bestehenden Arbeitsdaten
-    try:
-        existing_data = pd.read_csv('Arbeitsdaten.csv')
-    except FileNotFoundError:
-        existing_data = pd.DataFrame()
-
     # CSV-Datei hochladen
     uploaded_file = st.sidebar.file_uploader("CSV hochladen", type=["csv"])
     if uploaded_file is not None:
-        df = pd.read_csv(uploaded_file)
+        new_data = pd.read_csv(uploaded_file)
 
         # Laden des Modells
         load_model()
@@ -88,24 +82,29 @@ def main():
         material = st.sidebar.text_input("Bearbeitetes Material", "Material ABC")
 
         # Vorhersage durchführen
-        y_pred = predict(df[['Area Under Curve', 'Standard Deviation (Frequency)']])
+        y_pred = predict(new_data[['Area Under Curve', 'Standard Deviation (Frequency)']])
         now = datetime.now()
-        new_data = pd.DataFrame({
-            'Uhrzeit': [now.strftime("%Y-%m-%d %H:%M:%S") for _ in range(len(y_pred))],
-            'Werkzeugtyp': [werkzeugtyp] * len(y_pred),
-            'Einsatzdauer': [einsatzdauer_min] * len(y_pred),
-            'Bearbeitetes Material': [material] * len(y_pred),
-            'Werkzeugverschleiß': y_pred,
-            'Werkzeugkapazität': [100 - int(100 * (pred / 300)) for pred in y_pred]
-        })
+        new_data['Uhrzeit'] = now.strftime("%Y-%m-%d %H:%M:%S")
+        new_data['Werkzeugtyp'] = werkzeugtyp
+        new_data['Einsatzdauer'] = einsatzdauer_min
+        new_data['Bearbeitetes Material'] = material
+        new_data['Werkzeugverschleiß'] = y_pred
+        new_data['Werkzeugkapazität'] = [100 - int(100 * (pred / 300)) for pred in y_pred]
 
-        # Zusammenführen der neuen und vorhandenen Daten
-        combined_data = pd.concat([existing_data, new_data], ignore_index=True)
-
-        # Speichern der Daten in der CSV-Datei und Anzeige des Diagramms und der Prognose
+        # Daten erst speichern, wenn der Button geklickt wird
         if st.sidebar.button("Daten speichern"):
+            # Laden der bestehenden Arbeitsdaten
+            try:
+                existing_data = pd.read_csv('Arbeitsdaten.csv')
+            except FileNotFoundError:
+                existing_data = pd.DataFrame()
+
+            # Zusammenführen der neuen und vorhandenen Daten
+            combined_data = pd.concat([existing_data, new_data], ignore_index=True)
             combined_data.to_csv('Arbeitsdaten.csv', index=False)
             st.sidebar.success("Daten erfolgreich gespeichert!")
+
+            # Darstellung der Prognosen und des Diagramms
             display_predictions(combined_data)
             st.subheader("Werkzeugverschleiß-Diagramm")
             create_chart(combined_data)
