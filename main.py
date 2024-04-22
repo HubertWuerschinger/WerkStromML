@@ -9,11 +9,6 @@ import matplotlib.pyplot as plt
 model_file_path = "regression_model.h5"
 loaded_model = None
 
-# Daten für das Diagramm initialisieren
-time_list = []
-tool_capacity_list = []
-y_pred_list = []
-
 def load_model():
     global loaded_model
     with h5py.File(model_file_path, 'r') as file:
@@ -21,7 +16,6 @@ def load_model():
         model_intercept = file['model_intercept'][()]
         loaded_model = {'weights': model_weights, 'intercept': model_intercept}
 
-# Funktion zur Durchführung der Vorhersage
 def predict(df):
     if loaded_model is not None:
         X = df[['Area Under Curve', 'Standard Deviation (Frequency)']]
@@ -29,6 +23,16 @@ def predict(df):
         return y_pred
     else:
         st.error("Fehler: Modell nicht geladen")
+
+def create_chart(df):
+    plt.figure(figsize=(10, 6))
+    plt.plot(pd.to_datetime(df['Uhrzeit']), df['Werkzeugverschleiß'], marker='o', linestyle='-', color='b')
+    plt.title('Werkzeugverschleiß')
+    plt.xlabel('Zeit')
+    plt.ylabel('Werkzeugverschleiß (µm)')
+    plt.grid(True)
+    plt.xticks(rotation=45)
+    plt.show()
 
 # Farbskala für die Prognosewerte
 def color_scale(value):
@@ -45,36 +49,30 @@ def color_scale(value):
     else:
         return 'darkred'
 
-# Farbskala für den Balken basierend auf dem Prognosewert
-def slider_color_scale(value):
-    if value <= 50:
-        return '#00FF00'  # Grün
-    elif value <= 100:
-        return '#7FFF00'  # Grasgrün
-    elif value <= 150:
-        return '#FFFF00'  # Gelb
-    elif value <= 200:
-        return '#FFA500'  # Orange
-    elif value <= 250:
-        return '#FF0000'  # Rot
-    else:
-        return '#8B0000'  # Dunkelrot
+# Funktion zur Darstellung der Prognosewerte und des Verschleißgrads
+def display_predictions(df):
+    st.subheader("Werkzeugverschleißmessung:")
+    for i, row in df.iterrows():
+        pred = row['Werkzeugverschleiß']
+        st.write(f"Modellprognose: {int(pred)} µm")
+        color = color_scale(pred)
+        st.markdown(f"<div style='background-color: {color}; padding: 8px; border-radius: 5px;'></div>", unsafe_allow_html=True)
 
-# Funktion zum Erstellen des Diagramms
-def create_chart():
-    plt.figure(figsize=(10, 6))
-    plt.plot(time_list, y_pred_list, marker='o', linestyle='-', color='b')
-    plt.title('Werkzeugverschleiß')
-    plt.xlabel('Zeit')
-    plt.ylabel('Werkzeugverschleiß (µm)')
-    plt.grid(True)
-    plt.xticks(rotation=45)  # Rotation der X-Achsen-Beschriftungen
-    return plt
+        # Anzeige des Balkens mit variabler Länge basierend auf dem Verschleißgrad
+        progress_bar_value = 100 - int(100 * (pred / 300))
+        st.progress(progress_bar_value)
+        st.write(f"Werkzeugkapazität: {progress_bar_value}%")
 
 # Streamlit-Anwendung
 def main():
     st.title("WerkStromML")
     st.sidebar.title("CSV hochladen und Arbeitsdaten eingeben")
+
+    # Laden der bestehenden Arbeitsdaten
+    try:
+        existing_data = pd.read_csv('Arbeitsdaten.csv')
+    except FileNotFoundError:
+        existing_data = pd.DataFrame()
 
     # CSV-Datei hochladen
     uploaded_file = st.sidebar.file_uploader("CSV hochladen", type=["csv"])
@@ -91,72 +89,26 @@ def main():
 
         # Vorhersage durchführen
         y_pred = predict(df[['Area Under Curve', 'Standard Deviation (Frequency)']])
-
-        # Daten für das Diagramm sammeln und speichern
-        global time_list, tool_capacity_list, y_pred_list
         now = datetime.now()
-        for pred in y_pred:
-            time_list.append(now)
-            if pred <= 0:
-                tool_capacity = 100
-            elif pred >= 300:
-                tool_capacity = 0
-            else:
-                tool_capacity = 100 - int(100 * (pred / 300))
-            tool_capacity_list.append(tool_capacity)
-            y_pred_list.append(pred)
-
-        # Diagramm erstellen
-        st.subheader("Werkzeugverschleiß-Diagramm")
-        st.pyplot(create_chart())
-
-        # Anzeige der Vorhersagen mit Farbskala und Balken
-        st.subheader("Werkzeugverschleißmessung:")
-        for pred in y_pred:
-            st.write(f"Modellprognose: {int(pred)} µm", unsafe_allow_html=True, key=str(int(pred)))
-
-            st.write(
-                f"<div style='background-color: {color_scale(pred)}; padding: 8px; border-radius: 5px;'></div>",
-                unsafe_allow_html=True
-            )
-            
-            # Anzeige des Balkens mit variabler Länge basierend auf dem Verschleißgrad
-            if pred <= 0:
-                tool_capacity = 100
-            elif pred >= 300:
-                tool_capacity = 0
-            else:
-                tool_capacity = 100 - int(100 * (pred / 300))  # Umgekehrter Verschleißgrad
-
-            st.subheader("Verschleißgrad:")
-            progress_bar_value = int(100 * (pred / 300))
-            st.progress(progress_bar_value)
-            st.write(f"Werkzeugvebrauch: {progress_bar_value}%")
-
-        # Aktuelles Datum und Uhrzeit
-        now = datetime.now()
-        current_date = now.strftime("%Y-%m-%d")
-        current_time = now.strftime("%H:%M:%S")
-
-        # Arbeitsdaten hinzufügen
         new_data = pd.DataFrame({
-            'Aktuelles Datum': [current_date] * len(y_pred),
-            'Uhrzeit': [current_time] * len(y_pred),
+            'Uhrzeit': [now.strftime("%Y-%m-%d %H:%M:%S") for _ in range(len(y_pred))],
             'Werkzeugtyp': [werkzeugtyp] * len(y_pred),
             'Einsatzdauer': [einsatzdauer_min] * len(y_pred),
             'Bearbeitetes Material': [material] * len(y_pred),
-            'Werkzeugverschleiß': y_pred_list,
-            'Werkzeugkapazität': tool_capacity_list
+            'Werkzeugverschleiß': y_pred,
+            'Werkzeugkapazität': [100 - int(100 * (pred / 300)) for pred in y_pred]
         })
 
-        df = pd.concat([df, new_data], ignore_index=True)
+        # Zusammenführen der neuen und vorhandenen Daten
+        combined_data = pd.concat([existing_data, new_data], ignore_index=True)
 
-        # Speichern der Daten in einer JSON-Datei
+        # Speichern der Daten in der CSV-Datei und Anzeige des Diagramms und der Prognose
         if st.sidebar.button("Daten speichern"):
-            with open('Arbeitsdaten.JSON', 'a') as file:
-                df.to_json(file, orient='records', lines=True)
-            file.close()
+            combined_data.to_csv('Arbeitsdaten.csv', index=False)
             st.sidebar.success("Daten erfolgreich gespeichert!")
+            display_predictions(combined_data)
+            st.subheader("Werkzeugverschleiß-Diagramm")
+            create_chart(combined_data)
 
 if __name__ == "__main__":
     main()
