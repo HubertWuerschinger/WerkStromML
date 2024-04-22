@@ -71,7 +71,7 @@ def main():
     if uploaded_file:
         new_data = pd.read_csv(uploaded_file)
         if not new_data.empty:
-            y_pred = predict(new_data[['Area Under Curve', 'Standard Deviation (Frequency)']])
+            #y_pred = predict(new_data[['Area Under Curve', 'Standard Deviation (Frequency)']])
             new_data['Uhrzeit'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             new_data['Werkzeugtyp'] = werkzeugtyp
             new_data['Einsatzdauer'] = einsatzdauer_min
