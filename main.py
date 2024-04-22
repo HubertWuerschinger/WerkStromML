@@ -3,6 +3,7 @@ import pandas as pd
 import h5py
 from datetime import datetime
 import matplotlib.pyplot as plt
+import os
 
 # Laden des gespeicherten Regressionsmodells
 model_file_path = "regression_model.h5"
@@ -64,6 +65,12 @@ def color_scale(value):
     else:
         return 'darkred'
 
+def reset_data():
+    if os.path.exists('Arbeitsdaten.csv'):
+        os.remove('Arbeitsdaten.csv')
+    st.session_state['data'] = pd.DataFrame()
+    st.success("Daten erfolgreich zurückgesetzt!")
+
 def main():
     st.title("WerkStromML")
     st.sidebar.title("CSV hochladen und Arbeitsdaten eingeben")
@@ -98,6 +105,9 @@ def main():
                 combined_data.to_csv('Arbeitsdaten.csv', index=False)
                 st.session_state['data'] = combined_data
                 st.sidebar.success("Daten erfolgreich gespeichert!")
+
+    if st.sidebar.button("Daten zurücksetzen"):
+        reset_data()
 
     # Diagramm immer anzeigen, wenn Daten vorhanden sind
     if not st.session_state['data'].empty:
